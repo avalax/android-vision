@@ -17,7 +17,6 @@ package com.google.android.gms.samples.vision.ocrreader.ui.camera;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
@@ -197,11 +196,10 @@ public class GraphicOverlay<T extends GraphicOverlay.Graphic> extends View {
      * Sets the camera attributes for size and facing direction, which informs how to transform
      * image coordinates later.
      */
-    public void setCameraInfo(int previewWidth, int previewHeight, int facing) {
+    public void setCameraInfo(int previewWidth, int previewHeight) {
         synchronized (lock) {
             this.previewWidth = previewWidth;
             this.previewHeight = previewHeight;
-            this.facing = facing;
         }
         postInvalidate();
     }

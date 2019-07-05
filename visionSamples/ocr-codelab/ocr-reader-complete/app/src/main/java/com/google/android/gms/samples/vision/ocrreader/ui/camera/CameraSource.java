@@ -19,14 +19,12 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.ImageFormat;
-import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.WindowManager;
 
 import androidx.annotation.RequiresPermission;
@@ -85,12 +83,6 @@ public class CameraSource {
     private int rotation;
 
     private Size previewSize;
-
-    // These instances need to be held onto to avoid GC of their underlying resources.  Even though
-    // these aren't used outside of the method that creates them, they still must have hard
-    // references maintained to them.
-    private SurfaceView dummySurfaceView;
-    private SurfaceTexture dummySurfaceTexture;
 
     /**
      * Dedicated thread and associated runnable for calling into the detector with frames, as the
@@ -206,39 +198,6 @@ public class CameraSource {
     public Size getPreviewSize() {
         return previewSize;
     }
-
-    public void doZoom(float scale) {
-        synchronized (cameraLock) {
-            if (camera == null) {
-                return;
-            }
-            int currentZoom = 0;
-            int maxZoom;
-            Camera.Parameters parameters = camera.getParameters();
-            if (!parameters.isZoomSupported()) {
-                Log.w(TAG, "Zoom is not supported on this device");
-                return;
-            }
-            maxZoom = parameters.getMaxZoom();
-
-            currentZoom = parameters.getZoom() + 1;
-            float newZoom;
-            if (scale > 1) {
-                newZoom = currentZoom + scale * (maxZoom / 10);
-            } else {
-                newZoom = currentZoom * scale;
-            }
-            currentZoom = Math.round(newZoom) - 1;
-            if (currentZoom < 0) {
-                currentZoom = 0;
-            } else if (currentZoom > maxZoom) {
-                currentZoom = maxZoom;
-            }
-            parameters.setZoom(currentZoom);
-            camera.setParameters(parameters);
-        }
-    }
-
 
     //==============================================================================================
     // Private

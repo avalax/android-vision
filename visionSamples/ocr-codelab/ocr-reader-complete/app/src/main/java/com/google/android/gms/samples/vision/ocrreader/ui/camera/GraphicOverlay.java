@@ -30,11 +30,11 @@ import java.util.Set;
  * A view which renders a series of custom graphics to be overlaid on top of an associated preview
  * (i.e., the camera preview).  The creator can add graphics objects, update the objects, and remove
  * them, triggering the appropriate drawing and invalidation within the view.<p>
- *
+ * <p>
  * Supports scaling and mirroring of the graphics relative the camera's preview properties.  The
  * idea is that detection items are expressed in terms of a preview size, but need to be scaled up
  * to the full view size, and also mirrored in the case of the front-facing camera.<p>
- *
+ * <p>
  * Associated {@link Graphic} items should use the following methods to convert to view coordinates
  * for the graphics that are drawn:
  * <ol>
@@ -164,18 +164,9 @@ public class GraphicOverlay<T extends GraphicOverlay.Graphic> extends View {
     }
 
     /**
-     * Removes a graphic from the overlay.
-     */
-    public void remove(T graphic) {
-        synchronized (lock) {
-            graphics.remove(graphic);
-        }
-        postInvalidate();
-    }
-
-    /**
      * Returns the first graphic, if any, that exists at the provided absolute screen coordinates.
      * These coordinates will be offset by the relative screen position of this view.
+     *
      * @return First graphic containing the point, or null if no text is detected.
      */
     public T getGraphicAtLocation(float rawX, float rawY) {
@@ -213,8 +204,8 @@ public class GraphicOverlay<T extends GraphicOverlay.Graphic> extends View {
 
         synchronized (lock) {
             if ((previewWidth != 0) && (previewHeight != 0)) {
-                widthScaleFactor = (float) canvas.getWidth() / (float) previewWidth;
-                heightScaleFactor = (float) canvas.getHeight() / (float) previewHeight;
+                widthScaleFactor = (float) getWidth() / (float) previewWidth;
+                heightScaleFactor = (float) getHeight() / (float) previewHeight;
             }
 
             for (Graphic graphic : graphics) {

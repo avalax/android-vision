@@ -196,7 +196,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
             }
         }
 
-        cameraSource = CameraSource.newInstance(getApplicationContext(), textRecognizer);
+        cameraSource = new CameraSource(getApplicationContext(), textRecognizer);
     }
 
     /**

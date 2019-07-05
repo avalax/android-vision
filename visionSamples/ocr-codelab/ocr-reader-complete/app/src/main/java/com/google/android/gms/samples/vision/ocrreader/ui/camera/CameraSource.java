@@ -27,6 +27,7 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresPermission;
 
 import com.google.android.gms.common.images.Size;
@@ -98,18 +99,9 @@ public class CameraSource {
      */
     private Map<byte[], ByteBuffer> bytesToByteBuffer = new HashMap<>();
 
-    public static CameraSource newInstance(Context context, Detector<?> detector) {
-        if (context == null) {
-            throw new IllegalArgumentException("No context supplied.");
-        }
-        if (detector == null) {
-            throw new IllegalArgumentException("No detector supplied.");
-        }
-
-        CameraSource cameraSource = new CameraSource();
-        cameraSource.context = context;
-        cameraSource.frameProcessor = cameraSource.new FrameProcessingRunnable(detector);
-        return cameraSource;
+    public CameraSource(@NonNull Context context, @NonNull Detector<?> detector) {
+        this.context = context;
+        this.frameProcessor = new FrameProcessingRunnable(detector);
     }
 
     //==============================================================================================
@@ -136,17 +128,15 @@ public class CameraSource {
     @RequiresPermission(Manifest.permission.CAMERA)
     public CameraSource start(SurfaceHolder surfaceHolder) throws IOException {
         synchronized (cameraLock) {
-            if (camera != null) {
-                return this;
+            if (camera == null) {
+                camera = createCamera();
+                camera.setPreviewDisplay(surfaceHolder);
+                camera.startPreview();
+
+                processingThread = new Thread(frameProcessor);
+                frameProcessor.setActive(true);
+                processingThread.start();
             }
-
-            camera = createCamera();
-            camera.setPreviewDisplay(surfaceHolder);
-            camera.startPreview();
-
-            processingThread = new Thread(frameProcessor);
-            frameProcessor.setActive(true);
-            processingThread.start();
         }
         return this;
     }
@@ -197,16 +187,6 @@ public class CameraSource {
      */
     public Size getPreviewSize() {
         return previewSize;
-    }
-
-    //==============================================================================================
-    // Private
-    //==============================================================================================
-
-    /**
-     * Only allow creation via the builder class.
-     */
-    private CameraSource() {
     }
 
     /**

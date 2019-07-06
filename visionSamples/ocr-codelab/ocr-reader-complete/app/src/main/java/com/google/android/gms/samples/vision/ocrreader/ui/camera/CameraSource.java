@@ -104,10 +104,6 @@ public class CameraSource {
         this.frameProcessor = new FrameProcessingRunnable(detector);
     }
 
-    //==============================================================================================
-    // Public
-    //==============================================================================================
-
     /**
      * Stops the camera and releases the resources of the camera and underlying detector.
      */
